@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Robot Doğrulama - Keneviz System</title>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .gif-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+            opacity: 0.35;
+        }
+
+        .gif-background img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .verification-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .logo {
+            color: white;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            font-weight: 800;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .title {
+            color: white;
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .description {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1rem;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .recaptcha-container {
+            margin: 25px 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .error-message {
+            background: rgba(244, 67, 54, 0.8);
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .success-message {
+            background: rgba(76, 175, 80, 0.8);
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .info-box {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .info-title {
+            color: white;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .info-text {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .footer {
+            margin-top: 25px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.8rem;
+        }
+
+        .loading {
+            display: none;
+            color: white;
+            margin-top: 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- GIF Arka Plan -->
+    <div class="gif-background">
+        <img src="https://media0.giphy.com/media/v1.Y2lkPTZjMDliOTUyMmM0aTdib3o3eHlodTltcGY0dWFxMzJzZ3MwajhldTZ0cjFla3ZnZyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/SiLVShWtzjhbhQHP0V/giphy.gif" alt="Gumball Background">
+    </div>
+
+    <div class="verification-container">
+        <div class="logo">Keneviz System</div>
+        <h1 class="title">Robot Doğrulama</h1>
+        <p class="description">
+            Devam etmek için lütfen aşağıdaki reCAPTCHA'yı tamamlayarak robot olmadığınızı doğrulayın.
+        </p>
+
+        {% if error_message %}
+        <div class="error-message">
+            {{ error_message }}
+        </div>
+        {% endif %}
+
+        <form method="POST" id="verification-form">
+            <div class="recaptcha-container">
+                <div class="g-recaptcha" data-sitekey="{{ site_key }}"></div>
+            </div>
+            
+            <div class="loading" id="loading">
+                <div class="loading-spinner"></div>
+                Doğrulama yapılıyor...
+            </div>
+
+            <button type="submit" class="btn-submit" onclick="showLoading()">
+                Doğrulamayı Tamamla
+            </button>
+        </form>
+
+        <div class="info-box">
+            <div class="info-title">📋 Güvenlik Bilgisi</div>
+            <div class="info-text">
+                Bu doğrulama sistemi, otomatik bot saldırılarına karşı web sitemizi korumak için tasarlanmıştır. 
+                Doğrulama işlemi tamamlandıktan sonra Keneviz System API paneline erişim sağlayabileceksiniz.
+            </div>
+        </div>
+
+        <div class="footer">
+            © 2024 Keneviz System - Tüm hakları saklıdır.
+        </div>
+    </div>
+
+    <script>
+        function showLoading() {
+            const loading = document.getElementById('loading');
+            const submitBtn = document.querySelector('.btn-submit');
+            
+            // reCAPTCHA'nın doldurulup doldurulmadığını kontrol et
+            const recaptchaResponse = grecaptcha.getResponse();
+            
+            if (recaptchaResponse.length === 0) {
+                alert('Lütfen reCAPTCHA\'yı doğrulayın.');
+                return false;
+            }
+            
+            // Loading göster
+            loading.style.display = 'block';
+            submitBtn.disabled = true;
+            submitBtn.style.opacity = '0.7';
+            
+            return true;
+        }
+
+        // Form gönderildiğinde loading'i göster
+        document.getElementById('verification-form').addEventListener('submit', function(e) {
+            if (!showLoading()) {
+                e.preventDefault();
+            }
+        });
+
+        // Sayfa yüklendiğinde reCAPTCHA'yı kontrol et
+        window.onload = function() {
+            // Eğer reCAPTCHA zaten doğrulanmışsa ana sayfaya yönlendir
+            // Bu kısım session kontrolü için backend'de yapılıyor
+        };
+    </script>
+</body>
+  </html>
