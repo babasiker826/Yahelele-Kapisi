@@ -6,8 +6,8 @@ app = Flask(__name__)
 app.secret_key = 'rusyagelirseninam1nakoyar9392'  # Güvenli bir secret key kullanın
 
 # reCAPTCHA anahtarlarınızı buraya girin
-RECAPTCHA_SITE_KEY = 'sizin_site_key_buraya'
-RECAPTCHA_SECRET_KEY = 'sizin_secret_key_buraya'
+RECAPTCHA_SITE_KEY = '6LeZbdwrAAAAAJiGDLXDhGDQYR7tP47Ew0DivbXm'
+RECAPTCHA_SECRET_KEY = '6LeZbdwrAAAAAL-Bfj649b4c-VOlRZNexx5Ibapr'
 
 @app.route('/')
 def index():
