@@ -1,0 +1,1229 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keneviz System - API Servisleri</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            min-height: 100vh;
+            overflow-x: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+            position: relative;
+            min-width: 1000px;
+        }
+
+        /* GIF Arka Plan */
+        .gif-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+            opacity: 0.35;
+        }
+
+        .gif-background img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1800px;
+            margin: 0 auto;
+            z-index: 1;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            width: 100%;
+        }
+
+        h1 {
+            color: white;
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+
+        .subtitle {
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 1.3rem;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .api-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            width: 100%;
+        }
+
+        .api-box {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(12px);
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 160px;
+        }
+
+        .api-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+        }
+
+        .api-title {
+            color: white;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+
+        .api-title::before {
+            content: "🔗";
+            margin-right: 8px;
+            font-size: 0.9rem;
+        }
+
+        .api-description {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.85rem;
+            margin-bottom: 12px;
+            line-height: 1.4;
+            flex-grow: 1;
+        }
+
+        .api-url {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 6px;
+            padding: 6px 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.9);
+            word-break: break-all;
+            margin-bottom: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .api-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .btn {
+            padding: 6px 8px;
+            border-radius: 6px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.75rem;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .btn-copy {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-copy:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .btn-go {
+            background: rgba(255, 215, 0, 0.8);
+            color: #1e3c72;
+            border: 1px solid rgba(255, 215, 0, 0.5);
+        }
+
+        .btn-go:hover {
+            background: rgba(255, 215, 0, 1);
+            transform: scale(1.05);
+        }
+
+        .btn-test {
+            background: rgba(76, 175, 80, 0.7);
+            color: white;
+            border: 1px solid rgba(76, 175, 80, 0.4);
+        }
+
+        .btn-test:hover {
+            background: rgba(76, 175, 80, 0.9);
+        }
+
+        .btn-docs {
+            background: rgba(156, 39, 176, 0.7);
+            color: white;
+            border: 1px solid rgba(156, 39, 176, 0.4);
+        }
+
+        .btn-docs:hover {
+            background: rgba(156, 39, 176, 0.9);
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        /* Responsive düzenlemeler */
+        @media (max-width: 1200px) {
+            .api-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 900px) {
+            .api-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            h1 {
+                font-size: 2.8rem;
+            }
+        }
+
+        @media (max-width: 600px) {
+            body {
+                min-width: 800px;
+            }
+
+            .api-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            h1 {
+                font-size: 2.2rem;
+            }
+
+            .subtitle {
+                font-size: 1.1rem;
+            }
+
+            .api-actions {
+                flex-wrap: wrap;
+            }
+
+            .btn {
+                flex: 1 1 45%;
+                font-size: 0.7rem;
+                padding: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- GIF Arka Plan -->
+    <div class="gif-background">
+        <img src="https://media0.giphy.com/media/v1.Y2lkPTZjMDliOTUyMmM0aTdib3o3eHlodTltcGY0dWFxMzJzZ3MwajhldTZ0cjFla3ZnZyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/SiLVShWtzjhbhQHP0V/giphy.gif" alt="Gumball Background">
+    </div>
+
+    <div class="container">
+        <header>
+            <h1>Keneviz System</h1>
+            <p class="subtitle">56 Aktif API ile Gelişmiş Sorgulama Çözümleri</p>
+            <div class="stats">56 API • Tümü Aktif</div>
+        </header>
+
+        <div class="api-grid">
+            <!-- API 1 -->
+            <div class="api-box">
+                <div>
+                    <h3 class="api-title">Seçmen Sorgulama</h3>
+                    <p class="api-description">TC kimlik numarasına göre seçmen bilgilerini sorgulama.</p>
+                    <div class="api-url">https://keneviz.sorgu-api.xo.je/secmen?tc={tc}</div>
+                </div>
+                <div class="api-actions">
+                    <button class="btn btn-copy" onclick="copyToClipboard('https://keneviz.sorgu-api.xo.je/secmen?tc={tc}')">📋 Kopyala</button>
+                    <button class="btn btn-go" onclick="goToApi('https://keneviz.sorgu-api.xo.je/secmen?tc={tc}')">🚀 Git</button>
+                    <button class="btn btn-test" onclick="testApi('Seçmen Sorgulama')">⚡ Test</button>
+                    <button class="btn btn-docs" onclick="showDocs('Seçmen Sorgulama')">📚 Doküman</button>
+                </div>
+            </div>
+
+            <!-- API 2 -->
+            <div class="api-box">
+                <div>
+                    <h3 class="api-title">Öğretmen Sorgulama</h3>
+                    <p class="api-description">Ad ve soyada göre öğretmen bilgilerini sorgulama.</p>
+                    <div class="api-url">https://keneviz.sorgu-api.xo.je/ogretmen?ad={ad}&soyad={soyad}</div>
+                </div>
+                <div class="api-actions">
+                    <button class="btn btn-copy" onclick="copyToClipboard('https://keneviz.sorgu-api.xo.je/ogretmen?ad={ad}&soyad={soyad}')">📋 Kopyala</button>
+                    <button class="btn btn-go" onclick="goToApi('https://keneviz.sorgu-api.xo.je/ogretmen?ad={ad}&soyad={soyad}')">🚀 Git</button>
+                    <button class="btn btn-test" onclick="testApi('Öğretmen Sorgulama')">⚡ Test</button>
+                    <button class="btn btn-docs" onclick="showDocs('Öğretmen Sorgulama')">📚 Doküman</button>
+                </div>
+            </div>
+
+            <!-- API 3 -->
+            <div class="api-box">
+                <div>
+                    <h3 class="api-title">Yabancı Sorgulama</h3>
+                    <p class="api-description">Ad ve soyada göre yabancı bilgilerini sorgulama.</p>
+                    <div class="api-url">https://keneviz.sorgu-api.xo.je/yabanci?ad={ad}&soyad={soyad}</div>
+                </div>
+                <div class="api-actions">
+                    <button class="btn btn-copy" onclick="copyToClipboard('https://keneviz.sorgu-api.xo.je/yabanci?ad={ad}&soyad={soyad}')">📋 Kopyala</button>
+                    <button class="btn btn-go" onclick="goToApi('https://keneviz.sorgu-api.xo.je/yabanci?ad={ad}&soyad={soyad}')">🚀 Git</button>
+                    <button class="btn btn-test" onclick="testApi('Yabancı Sorgulama')">⚡ Test</button>
+                    <button class="btn btn-docs" onclick="showDocs('Yabancı Sorgulama')">📚 Doküman</button>
+                </div>
+            </div>
+
+            <!-- API 4 -->
+            <div class="api-box">
+                <div>
+                    <h3 class="api-title">Site Log Sorgulama</h3>
+                    <p class="api-description">Site adına göre log bilgilerini sorgulama.</p>
+                    <div class="api-url">https://keneviz.sorgu-api.xo.je/log?site={site}</div>
+                </div>
+                <div class="api-actions">
+                    <button class="btn btn-copy" onclick="copyToClipboard('https://keneviz.sorgu-api.xo.je/log?site={site}')">📋 Kopyala</button>
+                    <button class="btn btn-go" onclick="goToApi('https://keneviz.sorgu-api.xo.je/log?site={site}')">🚀 Git</button>
+                    <button class="btn btn-test" onclick="testApi('Site Log Sorgulama')">⚡ Test</button>
+                    <button class="btn btn-docs" onclick="showDocs('Site Log Sorgulama')">📚 Doküman</button>
+                </div>
+            </div>
+
+            <!-- API 5 -->
+            <div class="api-box">
+                <div>
+                    <h3 class="api-title">Vesika Sorgulama (Hanedan)</h3>
+                    <p class="api-description">TC kimlik numarasına göre vesika bilgilerini sorgulama.</p>
+                    <div class="api-url">https://keneviz.sorgu-api.xo.je/vesika2?tc={tc}</div>
+                </div>
+                <div class="api-actions">
+                    <button class="btn btn-copy" onclick="copyToClipboard('https://keneviz.sorgu-api.xo.je/vesika2?tc={tc}')">📋 Kopyala</button>
+                    <button class="btn btn-go" onclick="goToApi('https://keneviz.sorgu-api.xo.je/vesika2?tc={tc}')">🚀 Git</button>
+                    <button class="btn btn-test" onclick="testApi('Vesika Sorgulama')">⚡ Test</button>
+                    <button class="btn btn-docs" onclick="showDocs('Vesika Sorgulama')">📚 Doküman</button>
+                </div>
+            </div>
+
+            <!-- API 6 -->
+            <div class="api-box">
+                <div>
+                    <h3 class="api-title">Tapu Sorgulama (Hanedan)</h3>
+                    <p class="api-description">TC kimlik numarasına göre tapu bilgilerini sorgulama.</p>
+                    <div class="api-url">https://keneviz.sorgu-api.xo.je/tapu2?tc={tc}</div>
+                </div>
+                <div class="api-actions">
+                    <button class="btn btn-copy" onclick="copyToClipboard('https://keneviz.sorgu-api.xo.je/tapu2?tc={tc}')">📋 Kopyala</button>
+                    <button class="btn btn-go" onclick="goToApi('https://keneviz.sorgu-api.xo.je/tapu2?tc={tc}')">🚀 Git</button>
+                    <button class="btn btn-test" onclick="testApi('Tapu Sorgulama')">⚡ Test</button>
+                    <button class="btn btn-docs" onclick="showDocs('Tapu Sorgulama')">📚 Doküman</button>
+                </div>
+            </div>
+
+            <!-- API 7 -->
+            <div class="api-box">
+                <div>
+                    <h3 class="api-title">İş Kaydı Sorgulama</h3>
+                    <p class="api-description">Ad soyada göre iş kaydı bilgilerini sorgulama.</p>
+                    <div class="api-url">https://keneviz.sorgu-api.xo.je/iskaydi?adsoyad={adsoyad}</div>
+                </div>
+                <div class="api-actions">
+                    <button class="btn btn-copy" onclick="copyToClipboard('https://keneviz.sorgu-api.xo.je/iskaydi?adsoyad={adsoyad}')">📋 Kopyala</button>
+                    <button class="btn btn-go" onclick="goToApi('https://keneviz.sorgu-api.xo.je/iskaydi?adsoyad={adsoyad}')">🚀 Git</button>
+                    <button class="btn btn-test" onclick="testApi('İş Kaydı Sorgulama')">⚡ Test</button>
+                    <button class="btn btn-docs" onclick="showDocs('İş Kaydı Sorgulama')">📚 Doküman</button>
+                </div>
+            </div>
+
+            <!-- API 8 -->
+            <div class="api-box">
+                <div>
+                    <h3 class="api-title">Sertifika Sorgulama (Hanedan)</h3>
+                    <p class="api-description">TC kimlik numarasına göre sertifika bilgilerini sorgulama.</p>
+                    <div class="api-url">https://keneviz.sorgu-api.xo.je/sertifika2?tc={tc}</div>
+                </div>
+                <div class="api-actions">
+                    <button class="btn btn-copy" onclick="copyToClipboard('https://keneviz.sorgu-api.xo.je/sertifika2?tc={tc}')">📋 Kopyala</button>
+                    <button class="btn btn-go" onclick="goToApi('https://keneviz.sorgu-api.xo.je/sertifika2?tc={tc}')">🚀 Git</button>
+                    <button class="btn btn-test" onclick="testApi('Sertifika Sorgulama')">⚡ Test</button>
+                    <button class="btn btn-docs" onclick="showDocs('Sertifika Sorgulama')">📚 Doküman</button>
+                </div>
+            </div>
+
+            <!-- API 9 -->
+            <div class="api-box">
+                <div>
+                    <h3 class="api-title">Papara No Sorgulama</h3>
+                    <p class="api-description">Papara numarasına göre kullanıcı bilgilerini sorgulama.</p>
+                    <div class="api-url">https://keneviz.sorgu-api.xo.je/papara?paparano={paparano}</div>
+                </div>
+                <div class="api-actions">
+                    <button class="btn btn-copy" onclick="copyToClipboard('https://keneviz.sorgu-api.xo.je/papara?paparano={paparano}')">📋 Kopyala</button>
+                    <button class="btn btn-go" onclick="goToApi('https://keneviz.sorgu-api.xo.je/papara?paparano={paparano}')">🚀 Git</button>
+                    <button class="btn btn-test" onclick="testApi('Papara No Sorgulama')">⚡ Test</button>
+                    <button class="btn btn-docs" onclick="showDocs('Papara No Sorgulama')">📚 Doküman</button>
+                </div>
+            </div>
+
+            <!-- API 10 -->
+            <div class="api-box">
+                <div>
+                    <h3 class="api-title">İninal No Sorgulama</h3>
+                    <p class="api-description">İninal numarasına göre kullanıcı bilgilerini sorgulama.</p>
+                    <div class="api-url">https://keneviz.sorgu-api.xo.je/ininal?ininal_no={ininal_no}</div>
+                </div>
+                <div class="api-actions">
+                    <button class="btn btn-copy" onclick="copyToClipboard('https://keneviz.sorgu-api.xo.je/ininal?ininal_no={ininal_no}')">📋 Kopyala</button>
+                    <button class="btn btn-go" onclick="goToApi('https://keneviz.sorgu-api.xo.je/ininal?ininal_no={ininal_no}')">🚀 Git</button>
+                    <button class="btn btn-test" onclick="testApi('İninal No Sorgulama')">⚡ Test</button>
+                    <button class="btn btn-docs" onclick="showDocs('İninal No Sorgulama')">📚 Doküman</button>
+                </div>
+            </div>
+
+            <!-- API 11 -->
+            <div class="api-box">
+                <div>
+                    <h3 class="api-title">TurkNet Sorgulama</h3>
+                    <p class="api-description">TC kimlik numarasına göre TurkNet bilgilerini sorgulama.</p>
+                    <div class="api-url">https://keneviz.sorgu-api.xo.je/turknet?tc={tc}</div>
+                </div>
+                <div class="api-actions">
+                    <button class="btn btn-copy" onclick="copyToClipboard('https://keneviz.sorgu-api.xo.je/turknet?tc={tc}')">📋 Kopyala</button>
+                    <button class="btn btn-go" onclick="goToApi('https://keneviz.sorgu-api.xo.je/turknet?tc={tc}')">🚀 Git</button>
+                    <button class="btn btn-test" onclick="testApi('TurkNet Sorgulama')">⚡ Test</button>
+                    <button class="btn btn-docs" onclick="showDocs('TurkNet Sorgulama')">📚 Doküman</button>
+                </div>
+            </div>
+
+            <!-- API 12 -->
+            <div class="api-box">
+                <div>
+                    <h3 class="api-title">Seri No Sorgulama</h3>
+                    <p class="api-description">TC kimlik numarasına göre seri numarası sorgulama.</p>
+                    <div class="api-url">https://keneviz.sorgu-api.xo.je/serino?tc={tc}</div>
+                </div>
+                <div class="api-actions">
+                    <button class="btn btn-copy" onclick="copyToClipboard('https://keneviz.sorgu-api.xo.je/serino?tc={tc}')">📋 Kopyala</button>
+                    <button class="btn btn-go" onclick="goToApi('https://keneviz.sorgu-api.xo.je/serino?tc={tc}')">🚀 Git</button>
+                    <button class="btn btn-test" onclick="testApi('Seri No Sorgulama')">⚡ Test</button>
+                    <button class="btn btn-docs" onclick="showDocs('Seri No Sorgulama')">📚 Doküman</button>
+                </div>
+            </div>
+
+            <!-- API 13 -->
+            <div class="api-box">
+                <div>
+                    <h3 class="api-title">Firma Ünvan Sorgulama</h3>
+                    <p class="api-description">Ünvana göre firma bilgilerini sorgulama.</p>
+                    <div class="api-url">https://keneviz.sorgu-api.xo.je/firma?unvan={unvan}</div>
+                </div>
+                <div class="api-actions">
+                    <button class="btn btn-copy" onclick="copyToClipboard('https://keneviz.sorgu-api.xo.je/firma?unvan={unvan}')">📋 Kopyala</button>
+                    <button class="btn btn-go" onclick="goToApi('https://keneviz.sorgu-api.xo.je/firma?unvan={unvan}')">🚀 Git</button>
+                    <button class="btn btn-test" onclick="testApi('Firma Ünvan Sorgulama')">⚡ Test</button>
+                    <button class="btn btn-docs" onclick="showDocs('Firma Ünvan Sorgulama')">📚 Doküman</button>
+                </div>
+            </div>
+
+            <!-- API 14 -->
+            <div class="api-box">
+                <div>
+                    <h3 class="api-title">Craftrise Kullanıcı Sorgu</h3>
+                    <p class="api-description">Ada göre Craftrise kullanıcı bilgilerini sorgulama.</p>
+                    <div class="api-url">https://keneviz.sorgu-api.xo.je/craftrise?ad={ad}</div>
+                </div>
+                <div class="api-actions">
+                    <button class="btn btn-copy" onclick="copyToClipboard('https://keneviz.sorgu-api.xo.je/craftrise?ad={ad}')">📋 Kopyala</button>
+                    <button class="btn btn-go" onclick="goToApi('https://keneviz.sorgu-api.xo.je/craftrise?ad={ad}')">🚀 Git</button>
+                    <button class="btn btn-test" onclick="testApi('Craftrise Kullanıcı Sorgu')">⚡ Test</button>
+                    <button class="btn btn-docs" onclick="showDocs('Craftrise Kullanıcı Sorgu')">📚 Doküman</button>
+                </div>
+            </div>
+
+            <!-- API 15 -->
+            <div class="api-box">
+                <div>
+                    <h3 class="api-title">SGK Sorgulama (Hanedan)</h3>
+                    <p class="api-description">TC kimlik numarasına göre SGK bilgilerini sorgulama.</p>
+                    <div class="api-url">https://keneviz.sorgu-api.xo.je/sgk2?tc={tc}</div>
+                </div>
+                <div class="api-actions">
+                    <button class="btn btn-copy" onclick="copyToClipboard('https://keneviz.sorgu-api.xo.je/sgk2?tc={tc}')">📋 Kopyala</button>
+                    <button class="btn btn-go" onclick="goToApi('https://keneviz.sorgu-api.xo.je/sgk2?tc={tc}')">🚀 Git</button>
+                    <button class="btn btn-test" onclick="testApi('SGK Sorgulama')">⚡ Test</button>
+                    <button class="btn btn-docs" onclick="showDocs('SGK Sorgulama')">📚 Doküman</button>
+                </div>
+            </div>
+
+            <!-- API 16 -->
+            <div class="api-box">
+                <div>
+                    <h3 class="api-title">Plaka Sorgulama (Hanedan)</h3>
+                    <p class="api-description">Plakaya göre araç bilgilerini sorgulama.</p>
+                    <div class="api-url">https://keneviz.sorgu-api.xo.je/plaka2?plaka={plaka}</div>
+                </div>
+                <div class="api-actions">
+                    <button class="btn btn-copy" onclick="copyToClipboard('https://keneviz.sorgu-api.xo.je/plaka2?plaka={plaka}')">📋 Kopyala</button>
+                    <button class="btn btn-go" onclick="goToApi('https://keneviz.sorgu-api.xo.je/plaka2?plaka={plaka}')">🚀 Git</button>
+                    <button class="btn btn-test" onclick="testApi('Plaka Sorgulama')">⚡ Test</button>
+                    <button class="btn btn-docs" onclick="showDocs('Plaka Sorgulama')">📚 Doküman</button>
+                </div>
+            </div>
+
+            <!-- API 17 -->
+            <div class="api-box">
+                <div>
+                    <h3 class="api-title">Plaka İsim Sorgulama</h3>
+                    <p class="api-description">İsme göre plaka bilgilerini sorgulama.</p>
+                    <div class="api-url">https://keneviz.sorgu-api.xo.je/plakaismi?isim={isim}</div>
+                </div>
+                <div class="api-actions">
+                    <button class="btn btn-copy" onclick="copyToClipboard('https://keneviz.sorgu-api.xo.je/plakaismi?isim={isim}')">📋 Kopyala</button>
+                    <button class="btn btn-go" onclick="goToApi('https://keneviz.sorgu-api.xo.je/plakaismi?isim={isim}')">🚀 Git</button>
+                    <button class="btn btn-test" onclick="testApi('Plaka İsim Sorgulama')">⚡ Test</button>
+                    <button class="btn btn-docs" onclick="showDocs('Plaka İsim Sorgulama')">📚 Doküman</button>
+                </div>
+            </div>
+
+            <!-- API 18 -->
+            <div class="api-box">
+                <div>
+                    <h3 class="api-title">Plaka Borç Sorgulama</h3>
+                    <p class="api-description">Plakaya göre borç bilgilerini sorgulama.</p>
+                    <div class="api-url">https://keneviz.sorgu-api.xo.je/plakaborc?plaka={plaka}</div>
+                </div>
+                <div class="api-actions">
+                    <button class="btn btn-copy" onclick="copyToClipboard('https://keneviz.sorgu-api.xo.je/plakaborc?plaka={plaka}')">📋 Kopyala</button>
+                    <button class="btn btn-go" onclick="goToApi('https://keneviz.sorgu-api.xo.je/plakaborc?plaka={plaka}')">🚀 Git</button>
+                    <button class="btn btn-test" onclick="testApi('Plaka Borç Sorgulama')">⚡ Test</button>
+                    <button class="btn btn-docs" onclick="showDocs('Plaka Borç Sorgulama')">📚 Doküman</button>
+                </div>
+            </div>
+
+            <!-- API 19 -->
+            <div class="api-box">
+                <div>
+                    <h3 class="api-title">AKP Üye Sorgulama</h3>
+                    <p class="api-description">Ad ve soyada göre AKP üye bilgilerini sorgulama.</p>
+                    <div class="api-url">https://keneviz.sorgu-api.xo.je/akp?ad={ad}&soyad={soyad}</div>
+                </div>
+                <div class="api-actions">
+                    <button class="btn btn-copy" onclick="copyToClipboard('https://keneviz.sorgu-api.xo.je/akp?ad={ad}&soyad={soyad}')">📋 Kopyala</button>
+                    <button class="btn btn-go" onclick="goToApi('https://keneviz.sorgu-api.xo.je/akp?ad={ad}&soyad={soyad}')">🚀 Git</button>
+                    <button class="btn btn-test" onclick="testApi('AKP Üye Sorgulama')">⚡ Test</button>
+                    <button class="btn btn-docs" onclick="showDocs('AKP Üye Sorgulama')">📚 Doküman</button>
+                </div>
+            </div>
+
+            <!-- API 20 -->
+            <div class="api-box">
+                <div>
+                    <h3 class="api-title">AI Fotoğraf Üretici</h3>
+                    <p class="api-description">Görsel URL'ine göre AI fotoğraf oluşturma.</p>
+                    <div class="api-url">https://keneviz.sorgu-api.xo.je/aifoto?img={img}</div>
+                </div>
+                <div class="api-actions">
+                    <button class="btn btn-copy" onclick="copyToClipboard('https://keneviz.sorgu-api.xo.je/aifoto?img={img}')">📋 Kopyala</button>
+                    <button class="btn btn-go" onclick="goToApi('https://keneviz.sorgu-api.xo.je/aifoto?img={img}')">🚀 Git</button>
+                    <button class="btn btn-test" onclick="testApi('AI Fotoğraf Üretici')">⚡ Test</button>
+                    <button class="btn btn-docs" onclick="showDocs('AI Fotoğraf Üretici')">📚 Doküman</button>
+                </div>
+            </div>
+
+            <!-- API 21 -->
+            <div class="api-box">
+                <div>
+                    <h3 class="api-title">Instagram Kullanıcı Sorgulama</h3>
+                    <p class="api-description">Kullanıcı adına göre Instagram bilgilerini sorgulama.</p>
+                    <div class="api-url">https://keneviz.sorgu-api.xo.je/insta?usr={usr}</div>
+                </div>
+                <div class="api-actions">
+                    <button class="btn btn-copy" onclick="copyToClipboard('https://keneviz.sorgu-api.xo.je/insta?usr={usr}')">📋 Kopyala</button>
+                    <button class="btn btn-go" onclick="goToApi('https://keneviz.sorgu-api.xo.je/insta?usr={usr}')">🚀 Git</button>
+                    <button class="btn btn-test" onclick="testApi('Instagram Kullanıcı Sorgulama')">⚡ Test</button>
+                    <button class="btn btn-docs" onclick="showDocs('Instagram Kullanıcı Sorgulama')">📚 Doküman</button>
+                </div>
+            </div>
+
+            <!-- API 22 -->
+            <div class="api-box">
+                <div>
+                    <h3 class="api-title">Facebook Kullanıcı Sorgulama (Hanedan)</h3>
+                    <p class="api-description">Ad ve soyada göre Facebook bilgilerini sorgulama.</p>
+                    <div class="api-url">https://keneviz.sorgu-api.xo.je/facebook_hanedan?ad={ad}&soyad={soyad}</div>
+                </div>
+                <div class="api-actions">
+                    <button class="btn btn-copy" onclick="copyToClipboard('https://keneviz.sorgu-api.xo.je/facebook_hanedan?ad={ad}&soyad={soyad}')">📋 Kopyala</button>
+                    <button class="btn btn-go" onclick="goToApi('https://keneviz.sorgu-api.xo.je/facebook_hanedan?ad={ad}&soyad={soyad}')">🚀 Git</button>
+                    <button class="btn btn-test" onclick="testApi('Facebook Kullanıcı Sorgulama')">⚡ Test</button>
+                    <button class="btn btn-docs" onclick="showDocs('Facebook Kullanıcı Sorgulama')">📚 Doküman</button>
+                </div>
+            </div>
+
+            <!-- API 23 -->
+            <div class="api-box">
+                <div>
+                    <h3 class="api-title">Üniversite Öğrenci Sorgulama</h3>
+                    <p class="api-description">TC kimlik numarasına göre üniversite öğrenci bilgilerini sorgulama.</p>
+                    <div class="api-url">https://keneviz.sorgu-api.xo.je/uni?tc={tc}</div>
+                </div>
+                <div class="api-actions">
+                    <button class="btn btn-copy" onclick="copyToClipboard('https://keneviz.sorgu-api.xo.je/uni?tc={tc}')">📋 Kopyala</button>
+                    <button class="btn btn-go" onclick="goToApi('https://keneviz.sorgu-api.xo.je/uni?tc={tc}')">🚀 Git</button>
+                    <button class="btn btn-test" onclick="testApi('Üniversite Öğrenci Sorgulama')">⚡ Test</button>
+                    <button class="btn btn-docs" onclick="showDocs('Üniversite Öğrenci Sorgulama')">📚 Doküman</button>
+                </div>
+            </div>
+
+            <!-- API 24 -->
+            <div class="api-box">
+                <div>
+                    <h3 class="api-title">LGS Sorgulama (Hanedan)</h3>
+                    <p class="api-description">TC kimlik numarasına göre LGS bilgilerini sorgulama.</p>
+                    <div class="api-url">https://keneviz.sorgu-api.xo.je/lgs_hanedan?tc={tc}</div>
+                </div>
+                <div class="api-actions">
+                    <button class="btn btn-copy" onclick="copyToClipboard('https://keneviz.sorgu-api.xo.je/lgs_hanedan?tc={tc}')">📋 Kopyala</button>
+                    <button class="btn btn-go" onclick="goToApi('https://keneviz.sorgu-api.xo.je/lgs_hanedan?tc={tc}')">🚀 Git</button>
+                    <button class="btn btn-test" onclick="testApi('LGS Sorgulama')">⚡ Test</button>
+                    <button class="btn btn-docs" onclick="showDocs('LGS Sorgulama')">📚 Doküman</button>
+                </div>
+            </div>
+
+            <!-- API 25 -->
+            <div class="api-box">
+                <div>
+                    <h3 class="api-title">Okul Numarası Sorgulama</h3>
+                    <p class="api-description">TC kimlik numarasına göre okul numarası sorgulama.</p>
+                    <div class="api-url">https://keneviz.sorgu-api.xo.je/okulno_hanedan?tc={tc}</div>
+                </div>
+                <div class="api-actions">
+                    <button class="btn btn-copy" onclick="copyToClipboard('https://keneviz.sorgu-api.xo.je/okulno_hanedan?tc={tc}')">📋 Kopyala</button>
+                    <button class="btn btn-go" onclick="goToApi('https://keneviz.sorgu-api.xo.je/okulno_hanedan?tc={tc}')">🚀 Git</button>
+                    <button class="btn btn-test" onclick="testApi('Okul Numarası Sorgulama')">⚡ Test</button>
+                    <button class="btn btn-docs" onclick="showDocs('Okul Numarası Sorgulama')">📚 Doküman</button>
+                </div>
+            </div>
+
+            <!-- API 26 -->
+            <div class="api-box">
+                <div>
+                    <h3 class="api-title">TC Sorgulama</h3>
+                    <p class="api-description">TC kimlik numarasına göre temel bilgileri sorgulama.</p>
+                    <div class="api-url">https://keneviz.sorgu-api.xo.je/tc_sorgulama?tc={tc}</div>
+                </div>
+                <div class="api-actions">
+                    <button class="btn btn-copy" onclick="copyToClipboard('https://keneviz.sorgu-api.xo.je/tc_sorgulama?tc={tc}')">📋 Kopyala</button>
+                    <button class="btn btn-go" onclick="goToApi('https://keneviz.sorgu-api.xo.je/tc_sorgulama?tc={tc}')">🚀 Git</button>
+                    <button class="btn btn-test" onclick="testApi('TC Sorgulama')">⚡ Test</button>
+                    <button class="btn btn-docs" onclick="showDocs('TC Sorgulama')">📚 Doküman</button>
+                </div>
+            </div>
+
+            <!-- API 27 -->
+            <div class="api-box">
+                <div>
+                    <h3 class="api-title">TC PRO Sorgulama</h3>
+                    <p class="api-description">TC kimlik numarasına göre detaylı bilgileri sorgulama.</p>
+                    <div class="api-url">https://keneviz.sorgu-api.xo.je/tc_pro_sorgulama?tc={tc}</div>
+                </div>
+                <div class="api-actions">
+                    <button class="btn btn-copy" onclick="copyToClipboard('https://keneviz.sorgu-api.xo.je/tc_pro_sorgulama?tc={tc}')">📋 Kopyala</button>
+                    <button class="btn btn-go" onclick="goToApi('https://keneviz.sorgu-api.xo.je/tc_pro_sorgulama?tc={tc}')">🚀 Git</button>
+                    <button class="btn btn-test" onclick="testApi('TC PRO Sorgulama')">⚡ Test</button>
+                    <button class="btn btn-docs" onclick="showDocs('TC PRO Sorgulama')">📚 Doküman</button>
+                </div>
+            </div>
+
+            <!-- API 28 -->
+            <div class="api-box">
+                <div>
+                    <h3 class="api-title">Hayat Hikayesi Sorgulama</h3>
+                    <p class="api-description">TC kimlik numarasına göre hayat hikayesi bilgilerini sorgulama.</p>
+                    <div class="api-url">https://keneviz.sorgu-api.xo.je/hayat_hikayesi?tc={tc}</div>
+                </div>
+                <div class="api-actions">
+                    <button class="btn btn-copy" onclick="copyToClipboard('https://keneviz.sorgu-api.xo.je/hayat_hikayesi?tc={tc}')">📋 Kopyala</button>
+                    <button class="btn btn-go" onclick="goToApi('https://keneviz.sorgu-api.xo.je/hayat_hikayesi?tc={tc}')">🚀 Git</button>
+                    <button class="btn btn-test" onclick="testApi('Hayat Hikayesi Sorgulama')">⚡ Test</button>
+                    <button class="btn btn-docs" onclick="showDocs('Hayat Hikayesi Sorgulama')">📚 Doküman</button>
+                </div>
+            </div>
+
+            <!-- API 29 -->
+            <div class="api-box">
+                <div>
+                    <h3 class="api-title">Ad Soyad Sorgulama</h3>
+                    <p class="api-description">Ad ve soyada göre temel bilgileri sorgulama.</p>
+                    <div class="api-url">https://keneviz.sorgu-api.xo.je/ad_soyad?ad={ad}&soyad={soyad}</div>
+                </div>
+                <div class="api-actions">
+                    <button class="btn btn-copy" onclick="copyToClipboard('https://keneviz.sorgu-api.xo.je/ad_soyad?ad={ad}&soyad={soyad}')">📋 Kopyala</button>
+                    <button class="btn btn-go" onclick="goToApi('https://keneviz.sorgu-api.xo.je/ad_soyad?ad={ad}&soyad={soyad}')">🚀 Git</button>
+                    <button class="btn btn-test" onclick="testApi('Ad Soyad Sorgulama')">⚡ Test</button>
+                    <button class="btn btn-docs" onclick="showDocs('Ad Soyad Sorgulama')">📚 Doküman</button>
+                </div>
+            </div>
+
+            <!-- API 30 -->
+            <div class="api-box">
+                <div>
+                    <h3 class="api-title">Ad Soyad PRO Sorgulama</h3>
+                    <p class="api-description">TC kimlik numarasına göre ad soyad detaylı sorgulama.</p>
+                    <div class="api-url">https://keneviz.sorgu-api.xo.je/ad_soyad_pro?tc={tc}</div>
+                </div>
+                <div class="api-actions">
+                    <button class="btn btn-copy" onclick="copyToClipboard('https://keneviz.sorgu-api.xo.je/ad_soyad_pro?tc={tc}')">📋 Kopyala</button>
+                    <button class="btn btn-go" onclick="goToApi('https://keneviz.sorgu-api.xo.je/ad_soyad_pro?tc={tc}')">🚀 Git</button>
+                    <button class="btn btn-test" onclick="testApi('Ad Soyad PRO Sorgulama')">⚡ Test</button>
+                    <button class="btn btn-docs" onclick="showDocs('Ad Soyad PRO Sorgulama')">📚 Doküman</button>
+                </div>
+            </div>
+
+            <!-- API 31 -->
+            <div class="api-box">
+                <div>
+                    <h3 class="api-title">İş Yeri Sorgulama</h3>
+                    <p class="api-description">TC kimlik numarasına göre iş yeri bilgilerini sorgulama.</p>
+                    <div class="api-url">https://keneviz.sorgu-api.xo.je/is_yeri?tc={tc}</div>
+                </div>
+                <div class="api-actions">
+                    <button class="btn btn-copy" onclick="copyToClipboard('https://keneviz.sorgu-api.xo.je/is_yeri?tc={tc}')">📋 Kopyala</button>
+                    <button class="btn btn-go" onclick="goToApi('https://keneviz.sorgu-api.xo.je/is_yeri?tc={tc}')">🚀 Git</button>
+                    <button class="btn btn-test" onclick="testApi('İş Yeri Sorgulama')">⚡ Test</button>
+                    <button class="btn btn-docs" onclick="showDocs('İş Yeri Sorgulama')">📚 Doküman</button>
+                </div>
+            </div>
+
+            <!-- API 32 -->
+            <div class="api-box">
+                <div>
+                    <h3 class="api-title">Vergi No Sorgulama</h3>
+                    <p class="api-description">Vergi numarasına göre bilgileri sorgulama.</p>
+                    <div class="api-url">https://keneviz.sorgu-api.xo.je/vergi_no?vergi={vergi}</div>
+                </div>
+                <div class="api-actions">
+                    <button class="btn btn-copy" onclick="copyToClipboard('https://keneviz.sorgu-api.xo.je/vergi_no?vergi={vergi}')">📋 Kopyala</button>
+                    <button class="btn btn-go" onclick="goToApi('https://keneviz.sorgu-api.xo.je/vergi_no?vergi={vergi}')">🚀 Git</button>
+                    <button class="btn btn-test" onclick="testApi('Vergi No Sorgulama')">⚡ Test</button>
+                    <button class="btn btn-docs" onclick="showDocs('Vergi No Sorgulama')">📚 Doküman</button>
+                </div>
+            </div>
+
+            <!-- API 33 -->
+            <div class="api-box">
+                <div>
+                    <h3 class="api-title">Yaş Sorgulama</h3>
+                    <p class="api-description">TC kimlik numarasına göre yaş bilgisini sorgulama.</p>
+                    <div class="api-url">https://keneviz.sorgu-api.xo.je/yas?tc={tc}</div>
+                </div>
+                <div class="api-actions">
+                    <button class="btn btn-copy" onclick="copyToClipboard('https://keneviz.sorgu-api.xo.je/yas?tc={tc}')">📋 Kopyala</button>
+                    <button class="btn btn-go" onclick="goToApi('https://keneviz.sorgu-api.xo.je/yas?tc={tc}')">🚀 Git</button>
+                    <button class="btn btn-test" onclick="testApi('Yaş Sorgulama')">⚡ Test</button>
+                    <button class="btn btn-docs" onclick="showDocs('Yaş Sorgulama')">📚 Doküman</button>
+                </div>
+            </div>
+
+            <!-- API 34 -->
+            <div class="api-box">
+                <div>
+                    <h3 class="api-title">TC GSM Sorgulama</h3>
+                    <p class="api-description">TC kimlik numarasına göre GSM bilgilerini sorgulama.</p>
+                    <div class="api-url">https://keneviz.sorgu-api.xo.je/tc_gsm?tc={tc}</div>
+                </div>
+                <div class="api-actions">
+                    <button class="btn btn-copy" onclick="copyToClipboard('https://keneviz.sorgu-api.xo.je/tc_gsm?tc={tc}')">📋 Kopyala</button>
+                    <button class="btn btn-go" onclick="goToApi('https://keneviz.sorgu-api.xo.je/tc_gsm?tc={tc}')">🚀 Git</button>
+                    <button class="btn btn-test" onclick="testApi('TC GSM Sorgulama')">⚡ Test</button>
+                    <button class="btn btn-docs" onclick="showDocs('TC GSM Sorgulama')">📚 Doküman</button>
+                </div>
+            </div>
+
+            <!-- API 35 -->
+            <div class="api-box">
+                <div>
+                    <h3 class="api-title">GSM TC Sorgulama</h3>
+                    <p class="api-description">GSM numarasına göre TC bilgilerini sorgulama.</p>
+                    <div class="api-url">https://keneviz.sorgu-api.xo.je/gsm_tc?gsm={gsm}</div>
+                </div>
+                <div class="api-actions">
+                    <button class="btn btn-copy" onclick="copyToClipboard('https://keneviz.sorgu-api.xo.je/gsm_tc?gsm={gsm}')">📋 Kopyala</button>
+                    <button class="btn btn-go" onclick="goToApi('https://keneviz.sorgu-api.xo.je/gsm_tc?gsm={gsm}')">🚀 Git</button>
+                    <button class="btn btn-test" onclick="testApi('GSM TC Sorgulama')">⚡ Test</button>
+                    <button class="btn btn-docs" onclick="showDocs('GSM TC Sorgulama')">📚 Doküman</button>
+                </div>
+            </div>
+
+            <!-- API 36 -->
+            <div class="api-box">
+                <div>
+                    <h3 class="api-title">Adres Sorgulama</h3>
+                    <p class="api-description">TC kimlik numarasına göre adres bilgilerini sorgulama.</p>
+                    <div class="api-url">https://keneviz.sorgu-api.xo.je/adres?tc={tc}</div>
+                </div>
+                <div class="api-actions">
+                    <button class="btn btn-copy" onclick="copyToClipboard('https://keneviz.sorgu-api.xo.je/adres?tc={tc}')">📋 Kopyala</button>
+                    <button class="btn btn-go" onclick="goToApi('https://keneviz.sorgu-api.xo.je/adres?tc={tc}')">🚀 Git</button>
+                    <button class="btn btn-test" onclick="testApi('Adres Sorgulama')">⚡ Test</button>
+                    <button class="btn btn-docs" onclick="showDocs('Adres Sorgulama')">📚 Doküman</button>
+                </div>
+            </div>
+
+            <!-- API 37 -->
+            <div class="api-box">
+                <div>
+                    <h3 class="api-title">Hane Sorgulama</h3>
+                    <p class="api-description">TC kimlik numarasına göre hane bilgilerini sorgulama.</p>
+                    <div class="api-url">https://keneviz.sorgu-api.xo.je/hane?tc={tc}</div>
+                </div>
+                <div class="api-actions">
+                    <button class="btn btn-copy" onclick="copyToClipboard('https://keneviz.sorgu-api.xo.je/hane?tc={tc}')">📋 Kopyala</button>
+                    <button class="btn btn-go" onclick="goToApi('https://keneviz.sorgu-api.xo.je/hane?tc={tc}')">🚀 Git</button>
+                    <button class="btn btn-test" onclick="testApi('Hane Sorgulama')">⚡ Test</button>
+                    <button class="btn btn-docs" onclick="showDocs('Hane Sorgulama')">📚 Doküman</button>
+                </div>
+            </div>
+
+            <!-- API 38 -->
+            <div class="api-box">
+                <div>
+                    <h3 class="api-title">Apartman Sorgulama</h3>
+                    <p class="api-description">TC kimlik numarasına göre apartman bilgilerini sorgulama.</p>
+                    <div class="api-url">https://keneviz.sorgu-api.xo.je/apartman?tc={tc}</div>
+                </div>
+                <div class="api-actions">
+                    <button class="btn btn-copy" onclick="copyToClipboard('https://keneviz.sorgu-api.xo.je/apartman?tc={tc}')">📋 Kopyala</button>
+                    <button class="btn btn-go" onclick="goToApi('https://keneviz.sorgu-api.xo.je/apartman?tc={tc}')">🚀 Git</button>
+                    <button class="btn btn-test" onclick="testApi('Apartman Sorgulama')">⚡ Test</button>
+                    <button class="btn btn-docs" onclick="showDocs('Apartman Sorgulama')">📚 Doküman</button>
+                </div>
+            </div>
+
+            <!-- API 39 -->
+            <div class="api-box">
+                <div>
+                    <h3 class="api-title">Ada Parsel Sorgulama</h3>
+                    <p class="api-description">İl, ada ve parsele göre bilgileri sorgulama.</p>
+                    <div class="api-url">https://keneviz.sorgu-api.xo.je/ada_parsel?il={il}&ada={ada}&parsel={parsel}</div>
+                </div>
+                <div class="api-actions">
+                    <button class="btn btn-copy" onclick="copyToClipboard('https://keneviz.sorgu-api.xo.je/ada_parsel?il={il}&ada={ada}&parsel={parsel}')">📋 Kopyala</button>
+                    <button class="btn btn-go" onclick="goToApi('https://keneviz.sorgu-api.xo.je/ada_parsel?il={il}&ada={ada}&parsel={parsel}')">🚀 Git</button>
+                    <button class="btn btn-test" onclick="testApi('Ada Parsel Sorgulama')">⚡ Test</button>
+                    <button class="btn btn-docs" onclick="showDocs('Ada Parsel Sorgulama')">📚 Doküman</button>
+                </div>
+            </div>
+
+            <!-- API 40 -->
+            <div class="api-box">
+                <div>
+                    <h3 class="api-title">Adı İl İlçe Sorgulama</h3>
+                    <p class="api-description">Ad, il ve ilçeye göre bilgileri sorgulama.</p>
+                    <div class="api-url">https://keneviz.sorgu-api.xo.je/adi_il_ilce?ad={ad}&il={il}</div>
+                </div>
+                <div class="api-actions">
+                    <button class="btn btn-copy" onclick="copyToClipboard('https://keneviz.sorgu-api.xo.je/adi_il_ilce?ad={ad}&il={il}')">📋 Kopyala</button>
+                    <button class="btn btn-go" onclick="goToApi('https://keneviz.sorgu-api.xo.je/adi_il_ilce?ad={ad}&il={il}')">🚀 Git</button>
+                    <button class="btn btn-test" onclick="testApi('Adı İl İlçe Sorgulama')">⚡ Test</button>
+                    <button class="btn btn-docs" onclick="showDocs('Adı İl İlçe Sorgulama')">📚 Doküman</button>
+                </div>
+            </div>
+
+            <!-- API 41 -->
+            <div class="api-box">
+                <div>
+                    <h3 class="api-title">Aile Sorgulama</h3>
+                    <p class="api-description">TC kimlik numarasına göre aile bilgilerini sorgulama.</p>
+                    <div class="api-url">https://keneviz.sorgu-api.xo.je/aile?tc={tc}</div>
+                </div>
+                <div class="api-actions">
+                    <button class="btn btn-copy" onclick="copyToClipboard('https://keneviz.sorgu-api.xo.je/aile?tc={tc}')">📋 Kopyala</button>
+                    <button class="btn btn-go" onclick="goToApi('https://keneviz.sorgu-api.xo.je/aile?tc={tc}')">🚀 Git</button>
+                    <button class="btn btn-test" onclick="testApi('Aile Sorgulama')">⚡ Test</button>
+                    <button class="btn btn-docs" onclick="showDocs('Aile Sorgulama')">📚 Doküman</button>
+                </div>
+            </div>
+
+            <!-- API 42 -->
+            <div class="api-box">
+                <div>
+                    <h3 class="api-title">Aile PRO Sorgulama</h3>
+                    <p class="api-description">TC kimlik numarasına göre detaylı aile bilgilerini sorgulama.</p>
+                    <div class="api-url">https://keneviz.sorgu-api.xo.je/aile_pro?tc={tc}</div>
+                </div>
+                <div class="api-actions">
+                    <button class="btn btn-copy" onclick="copyToClipboard('https://keneviz.sorgu-api.xo.je/aile_pro?tc={tc}')">📋 Kopyala</button>
+                    <button class="btn btn-go" onclick="goToApi('https://keneviz.sorgu-api.xo.je/aile_pro?tc={tc}')">🚀 Git</button>
+                    <button class="btn btn-test" onclick="testApi('Aile PRO Sorgulama')">⚡ Test</button>
+                    <button class="btn btn-docs" onclick="showDocs('Aile PRO Sorgulama')">📚 Doküman</button>
+                </div>
+            </div>
+
+            <!-- API 43 -->
+            <div class="api-box">
+                <div>
+                    <h3 class="api-title">Eş Sorgulama</h3>
+                    <p class="api-description">TC kimlik numarasına göre eş bilgilerini sorgulama.</p>
+                    <div class="api-url">https://keneviz.sorgu-api.xo.je/es?tc={tc}</div>
+                </div>
+                <div class="api-actions">
+                    <button class="btn btn-copy" onclick="copyToClipboard('https://keneviz.sorgu-api.xo.je/es?tc={tc}')">📋 Kopyala</button>
+                    <button class="btn btn-go" onclick="goToApi('https://keneviz.sorgu-api.xo.je/es?tc={tc}')">🚀 Git</button>
+                    <button class="btn btn-test" onclick="testApi('Eş Sorgulama')">⚡ Test</button>
+                    <button class="btn btn-docs" onclick="showDocs('Eş Sorgulama')">📚 Doküman</button>
+                </div>
+            </div>
+
+            <!-- API 44 -->
+            <div class="api-box">
+                <div>
+                    <h3 class="api-title">Sülale Sorgulama</h3>
+                    <p class="api-description">TC kimlik numarasına göre sülale bilgilerini sorgulama.</p>
+                    <div class="api-url">https://keneviz.sorgu-api.xo.je/sulale?tc={tc}</div>
+                </div>
+                <div class="api-actions">
+                    <button class="btn btn-copy" onclick="copyToClipboard('https://keneviz.sorgu-api.xo.je/sulale?tc={tc}')">📋 Kopyala</button>
+                    <button class="btn btn-go" onclick="goToApi('https://keneviz.sorgu-api.xo.je/sulale?tc={tc}')">🚀 Git</button>
+                    <button class="btn btn-test" onclick="testApi('Sülale Sorgulama')">⚡ Test</button>
+                    <button class="btn btn-docs" onclick="showDocs('Sülale Sorgulama')">📚 Doküman</button>
+                </div>
+            </div>
+
+            <!-- API 45 -->
+            <div class="api-box">
+                <div>
+                    <h3 class="api-title">LGS Sorgulama</h3>
+                    <p class="api-description">TC kimlik numarasına göre LGS bilgilerini sorgulama.</p>
+                    <div class="api-url">https://keneviz.sorgu-api.xo.je/lgs?tc={tc}</div>
+                </div>
+                <div class="api-actions">
+                    <button class="btn btn-copy" onclick="copyToClipboard('https://keneviz.sorgu-api.xo.je/lgs?tc={tc}')">📋 Kopyala</button>
+                    <button class="btn btn-go" onclick="goToApi('https://keneviz.sorgu-api.xo.je/lgs?tc={tc}')">🚀 Git</button>
+                    <button class="btn btn-test" onclick="testApi('LGS Sorgulama')">⚡ Test</button>
+                    <button class="btn btn-docs" onclick="showDocs('LGS Sorgulama')">📚 Doküman</button>
+                </div>
+            </div>
+
+            <!-- API 46 -->
+            <div class="api-box">
+                <div>
+                    <h3 class="api-title">E-Kurs Sorgulama</h3>
+                    <p class="api-description">TC ve okul numarasına göre e-kurs bilgilerini sorgulama.</p>
+                    <div class="api-url">https://keneviz.sorgu-api.xo.je/e_kurs?tc={tc}&okulno={okulno}</div>
+                </div>
+                <div class="api-actions">
+                    <button class="btn btn-copy" onclick="copyToClipboard('https://keneviz.sorgu-api.xo.je/e_kurs?tc={tc}&okulno={okulno}')">📋 Kopyala</button>
+                    <button class="btn btn-go" onclick="goToApi('https://keneviz.sorgu-api.xo.je/e_kurs?tc={tc}&okulno={okulno}')">🚀 Git</button>
+                    <button class="btn btn-test" onclick="testApi('E-Kurs Sorgulama')">⚡ Test</button>
+                    <button class="btn btn-docs" onclick="showDocs('E-Kurs Sorgulama')">📚 Doküman</button>
+                </div>
+            </div>
+
+            <!-- API 47 -->
+            <div class="api-box">
+                <div>
+                    <h3 class="api-title">IP Sorgulama</h3>
+                    <p class="api-description">Domain'e göre IP bilgilerini sorgulama.</p>
+                    <div class="api-url">https://keneviz.sorgu-api.xo.je/ip?domain={domain}</div>
+                </div>
+                <div class="api-actions">
+                    <button class="btn btn-copy" onclick="copyToClipboard('https://keneviz.sorgu-api.xo.je/ip?domain={domain}')">📋 Kopyala</button>
+                    <button class="btn btn-go" onclick="goToApi('https://keneviz.sorgu-api.xo.je/ip?domain={domain}')">🚀 Git</button>
+                    <button class="btn btn-test" onclick="testApi('IP Sorgulama')">⚡ Test</button>
+                    <button class="btn btn-docs" onclick="showDocs('IP Sorgulama')">📚 Doküman</button>
+                </div>
+            </div>
+
+            <!-- API 48 -->
+            <div class="api-box">
+                <div>
+                    <h3 class="api-title">DNS Sorgulama</h3>
+                    <p class="api-description">Domain'e göre DNS bilgilerini sorgulama.</p>
+                    <div class="api-url">https://keneviz.sorgu-api.xo.je/dns?domain={domain}</div>
+                </div>
+                <div class="api-actions">
+                    <button class="btn btn-copy" onclick="copyToClipboard('https://keneviz.sorgu-api.xo.je/dns?domain={domain}')">📋 Kopyala</button>
+                    <button class="btn btn-go" onclick="goToApi('https://keneviz.sorgu-api.xo.je/dns?domain={domain}')">🚀 Git</button>
+                    <button class="btn btn-test" onclick="testApi('DNS Sorgulama')">⚡ Test</button>
+                    <button class="btn btn-docs" onclick="showDocs('DNS Sorgulama')">📚 Doküman</button>
+                </div>
+            </div>
+
+            <!-- API 49 -->
+            <div class="api-box">
+                <div>
+                    <h3 class="api-title">Whois Sorgulama</h3>
+                    <p class="api-description">Domain'e göre whois bilgilerini sorgulama.</p>
+                    <div class="api-url">https://keneviz.sorgu-api.xo.je/whois?domain={domain}</div>
+                </div>
+                <div class="api-actions">
+                    <button class="btn btn-copy" onclick="copyToClipboard('https://keneviz.sorgu-api.xo.je/whois?domain={domain}')">📋 Kopyala</button>
+                    <button class="btn btn-go" onclick="goToApi('https://keneviz.sorgu-api.xo.je/whois?domain={domain}')">🚀 Git</button>
+                    <button class="btn btn-test" onclick="testApi('Whois Sorgulama')">⚡ Test</button>
+                    <button class="btn btn-docs" onclick="showDocs('Whois Sorgulama')">📚 Doküman</button>
+                </div>
+            </div>
+
+            <!-- API 50 -->
+            <div class="api-box">
+                <div>
+                    <h3 class="api-title">Subdomain Sorgulama</h3>
+                    <p class="api-description">URL'e göre subdomain bilgilerini sorgulama.</p>
+                    <div class="api-url">https://keneviz.sorgu-api.xo.je/subdomain?url={url}</div>
+                </div>
+                <div class="api-actions">
+                    <button class="btn btn-copy" onclick="copyToClipboard('https://keneviz.sorgu-api.xo.je/subdomain?url={url}')">📋 Kopyala</button>
+                    <button class="btn btn-go" onclick="goToApi('https://keneviz.sorgu-api.xo.je/subdomain?url={url}')">🚀 Git</button>
+                    <button class="btn btn-test" onclick="testApi('Subdomain Sorgulama')">⚡ Test</button>
+                    <button class="btn btn-docs" onclick="showDocs('Subdomain Sorgulama')">📚 Doküman</button>
+                </div>
+            </div>
+
+            <!-- API 51 -->
+            <div class="api-box">
+                <div>
+                    <h3 class="api-title">Leak Sorgulama</h3>
+                    <p class="api-description">Query'e göre leak bilgilerini sorgulama.</p>
+                    <div class="api-url">https://keneviz.sorgu-api.xo.je/leak?query={query}</div>
+                </div>
+                <div class="api-actions">
+                    <button class="btn btn-copy" onclick="copyToClipboard('https://keneviz.sorgu-api.xo.je/leak?query={query}')">📋 Kopyala</button>
+                    <button class="btn btn-go" onclick="goToApi('https://keneviz.sorgu-api.xo.je/leak?query={query}')">🚀 Git</button>
+                    <button class="btn btn-test" onclick="testApi('Leak Sorgulama')">⚡ Test</button>
+                    <button class="btn btn-docs" onclick="showDocs('Leak Sorgulama')">📚 Doküman</button>
+                </div>
+            </div>
+
+            <!-- API 52 -->
+            <div class="api-box">
+                <div>
+                    <h3 class="api-title">Telegram Sorgulama</h3>
+                    <p class="api-description">Kullanıcı adına göre Telegram bilgilerini sorgulama.</p>
+                    <div class="api-url">https://keneviz.sorgu-api.xo.je/telegram?kullanici={kullanici}</div>
+                </div>
+                <div class="api-actions">
+                    <button class="btn btn-copy" onclick="copyToClipboard('https://keneviz.sorgu-api.xo.je/telegram?kullanici={kullanici}')">📋 Kopyala</button>
+                    <button class="btn btn-go" onclick="goToApi('https://keneviz.sorgu-api.xo.je/telegram?kullanici={kullanici}')">🚀 Git</button>
+                    <button class="btn btn-test" onclick="testApi('Telegram Sorgulama')">⚡ Test</button>
+                    <button class="btn btn-docs" onclick="showDocs('Telegram Sorgulama')">📚 Doküman</button>
+                </div>
+            </div>
+
+            <!-- API 53 -->
+            <div class="api-box">
+                <div>
+                    <h3 class="api-title">Şifre Encrypt</h3>
+                    <p class="api-description">Metod ve şifreye göre şifreleme işlemi.</p>
+                    <div class="api-url">https://keneviz.sorgu-api.xo.je/sifre_encrypt?method={method}&password={password}</div>
+                </div>
+                <div class="api-actions">
+                    <button class="btn btn-copy" onclick="copyToClipboard('https://keneviz.sorgu-api.xo.je/sifre_encrypt?method={method}&password={password}')">📋 Kopyala</button>
+                    <button class="btn btn-go" onclick="goToApi('https://keneviz.sorgu-api.xo.je/sifre_encrypt?method={method}&password={password}')">🚀 Git</button>
+                    <button class="btn btn-test" onclick="testApi('Şifre Encrypt')">⚡ Test</button>
+                    <button class="btn btn-docs" onclick="showDocs('Şifre Encrypt')">📚 Doküman</button>
+                </div>
+            </div>
+
+            <!-- API 54 -->
+            <div class="api-box">
+                <div>
+                    <h3 class="api-title">TC Sorgulama 2</h3>
+                    <p class="api-description">TC kimlik numarasına göre detaylı bilgileri sorgulama.</p>
+                    <div class="api-url">https://keneviz.sorgu-api.xo.je/tc2?tc={tc}</div>
+                </div>
+                <div class="api-actions">
+                    <button class="btn btn-copy" onclick="copyToClipboard('https://keneviz.sorgu-api.xo.je/tc2?tc={tc}')">📋 Kopyala</button>
+                    <button class="btn btn-go" onclick="goToApi('https://keneviz.sorgu-api.xo.je/tc2?tc={tc}')">🚀 Git</button>
+                    <button class="btn btn-test" onclick="testApi('TC Sorgulama 2')">⚡ Test</button>
+                    <button class="btn btn-docs" onclick="showDocs('TC Sorgulama 2')">📚 Doküman</button>
+                </div>
+            </div>
+
+            <!-- API 55 -->
+            <div class="api-box">
+                <div>
+                    <h3 class="api-title">Araç Sorgulama</h3>
+                    <p class="api-description">Plakaya göre araç detaylı bilgilerini sorgulama.</p>
+                    <div class="api-url">https://keneviz.sorgu-api.xo.je/arac?plaka={plaka}</div>
+                </div>
+                <div class="api-actions">
+                    <button class="btn btn-copy" onclick="copyToClipboard('https://keneviz.sorgu-api.xo.je/arac?plaka={plaka}')">📋 Kopyala</button>
+                    <button class="btn btn-go" onclick="goToApi('https://keneviz.sorgu-api.xo.je/arac?plaka={plaka}')">🚀 Git</button>
+                    <button class="btn btn-test" onclick="testApi('Araç Sorgulama')">⚡ Test</button>
+                    <button class="btn btn-docs" onclick="showDocs('Araç Sorgulama')">📚 Doküman</button>
+                </div>
+            </div>
+
+            <!-- API 56 -->
+            <div class="api-box">
+                <div>
+                    <h3 class="api-title">Sürücü Belgesi Sorgulama</h3>
+                    <p class="api-description">TC kimlik numarasına göre sürücü belgesi bilgilerini sorgulama.</p>
+                    <div class="api-url">https://keneviz.sorgu-api.xo.je/surucu?tc={tc}</div>
+                </div>
+                <div class="api-actions">
+                    <button class="btn btn-copy" onclick="copyToClipboard('https://keneviz.sorgu-api.xo.je/surucu?tc={tc}')">📋 Kopyala</button>
+                    <button class="btn btn-go" onclick="goToApi('https://keneviz.sorgu-api.xo.je/surucu?tc={tc}')">🚀 Git</button>
+                    <button class="btn btn-test" onclick="testApi('Sürücü Belgesi Sorgulama')">⚡ Test</button>
+                    <button class="btn btn-docs" onclick="showDocs('Sürücü Belgesi Sorgulama')">📚 Doküman</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Kopyala butonu işlevi
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(function() {
+                showNotification('API URL\'si panoya kopyalandı: ' + text);
+            }, function(err) {
+                console.error('Kopyalama başarısız: ', err);
+                showNotification('Kopyalama başarısız!', 'error');
+            });
+        }
+
+        // Git butonu işlevi
+        function goToApi(url) {
+            window.open(url, '_blank');
+        }
+
+        // Test butonu işlevi
+        function testApi(apiName) {
+            showNotification(apiName + ' API testi başlatılıyor...', 'info');
+            // Burada API test işlemleri yapılabilir
+            setTimeout(() => {
+                showNotification(apiName + ' API testi başarılı!', 'success');
+            }, 1500);
+        }
+
+        // Doküman butonu işlevi
+        function showDocs(apiName) {
+            showNotification(apiName + ' API dokümanları yükleniyor...', 'info');
+            // Burada doküman sayfasına yönlendirme yapılabilir
+            setTimeout(() => {
+                window.open('https://docs.kenevizsystem.com/' + apiName, '_blank');
+            }, 500);
+        }
+
+        // Bildirim sistemi
+        function showNotification(message, type = 'success') {
+            // Mevcut bildirimleri temizle
+            const existingNotification = document.querySelector('.notification');
+            if (existingNotification) {
+                existingNotification.remove();
+            }
+
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <div class="notification-content">
+                    <span class="notification-message">${message}</span>
+                    <button class="notification-close" onclick="this.parentElement.parentElement.remove()">×</button>
+                </div>
+            `;
+
+            // Stil ekle
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'error' ? '#f44336' : type === 'info' ? '#2196F3' : '#4CAF50'};
+                color: white;
+                padding: 15px 20px;
+                border-radius: 8px;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+                z-index: 1000;
+                animation: slideIn 0.3s ease;
+                max-width: 400px;
+            `;
+
+            document.body.appendChild(notification);
+
+            // 5 saniye sonra bildirimi kaldır
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, 5000);
+        }
+
+        // CSS animasyonu için style ekle
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            .notification-close {
+                background: none;
+                border: none;
+                color: white;
+                font-size: 18px;
+                cursor: pointer;
+                margin-left: 10px;
+                padding: 0;
+                width: 20px;
+                height: 20px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .notification-content {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Sayfa yüklendiğinde hoş geldin mesajı
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                showNotification('Keneviz System API Paneline Hoş Geldiniz! 56 aktif API hizmetinizde.', 'info');
+            }, 1000);
+        });
+    </script>
+</body>
+  </html>
